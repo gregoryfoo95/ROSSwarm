@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <world name="iris_runway">
+    <gravity>0 0 -9.81</gravity>
+
+    <!-- Spherical coordinates for Berkeley, CA -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>37.872991</latitude_deg>
+      <longitude_deg>-122.302348</longitude_deg>
+      <elevation>20.0</elevation>
+      <heading_deg>260.0</heading_deg>
+    </spherical_coordinates>
+
+    <!-- Physics engine -->
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Sun -->
+    <include>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Sun</uri>
+    </include>
+
+    <!-- Ground plane -->
+    <include>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane</uri>
+    </include>
+
+    <!-- Iris ArduCopter model -->
+    <include>
+      <uri>model://iris_with_ardupilot</uri>
+      <pose>0 0 0.1 0 0 0</pose>
+    </include>
+
+  </world>
+</sdf>

@@ -13,8 +13,8 @@ mkdir -p "$DEPS"
 if ! grep -q "source /opt/ros/humble/setup.bash" ~/.bashrc; then
   echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 fi
-if ! grep -q "export GZ_VERSION=fortress" ~/.bashrc; then
-  echo "export GZ_VERSION=fortress" >> ~/.bashrc
+if ! grep -q "export GZ_VERSION=garden" ~/.bashrc; then
+  echo "export GZ_VERSION=garden" >> ~/.bashrc
 fi
 
 # Clone ArduPilot if missing

@@ -5,12 +5,11 @@
 source /opt/ros/humble/setup.bash
 
 # Gazebo setup
-export GZ_VERSION=fortress
-export IGN_GAZEBO_RESOURCE_PATH="/usr/share/ignition/ignition-gazebo6/worlds:$IGN_GAZEBO_RESOURCE_PATH"
-export IGN_GAZEBO_MODEL_PATH="/usr/share/ignition/ignition-gazebo6/models:$IGN_GAZEBO_MODEL_PATH"
+export GZ_VERSION=garden
 
-# Use Fuel server for models if local ones aren't available
-export GZ_FUEL_CACHE_PATH="$HOME/.ignition/fuel"
+# ArduPilot Gazebo plugin paths
+export GZ_SIM_SYSTEM_PLUGIN_PATH="$HOME/dev/ROSSwarm/_deps/ardupilot_gazebo/build:$GZ_SIM_SYSTEM_PLUGIN_PATH"
+export GZ_SIM_RESOURCE_PATH="$HOME/dev/ROSSwarm/_deps/ardupilot_gazebo/models:$HOME/dev/ROSSwarm/_deps/ardupilot_gazebo/worlds:$GZ_SIM_RESOURCE_PATH"
 
 # Add local Python packages to path
 export PATH="$HOME/.local/bin:$PATH"

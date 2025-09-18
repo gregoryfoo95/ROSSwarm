@@ -39,3 +39,16 @@
 
 # debug information files
 *.dwo
+
+# local caches and installs
+_deps/
+build/
+install/
+log/
+.colcon/
+.venv/
+# editor/OS noise
+.DS_Store
+.idea/
+.vscode/
+.claude

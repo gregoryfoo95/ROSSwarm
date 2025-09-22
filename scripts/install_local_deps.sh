@@ -78,17 +78,6 @@ sudo apt-get install -y \
     python3-catkin-pkg \
     cmake
 
-# Install MAVROS2 for ROS2 Humble
-echo "[install] Installing MAVROS2 for ROS2 Humble..."
-sudo apt-get install -y \
-    ros-humble-mavros \
-    ros-humble-mavros-extras \
-    ros-humble-mavros-msgs
-
-# Install MAVROS GeographicLib datasets
-echo "[install] Installing GeographicLib datasets for MAVROS..."
-sudo /opt/ros/humble/lib/mavros/install_geographiclib_datasets.sh
-
 # Install Python packages
 echo "[install] Installing Python packages..."
 pip3 install --user --upgrade pip

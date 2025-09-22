@@ -1,13 +1,14 @@
 SHELL := /bin/bash
 
-.PHONY: help install build sitl gazebo iris-sim ros2-build ros2-launch test-flight stop clean
+.PHONY: help install build sitl mavproxy gz ros2-build ros2-launch test-flight stop clean 
 
 help:
 	@echo "Targets:"
 	@echo "  install      - install local dependencies (ROS 2, Gazebo, ArduPilot, MAVROS2)"
 	@echo "  build        - build ArduPilot SITL (ArduCopter)"
-	@echo "  iris-sim     - run integrated ArduCopter + Gazebo simulation (foreground)"
-	@echo "  iris-sim-bg  - run integrated ArduCopter + Gazebo simulation (background)"
+	@echo "  sitl         - run ArduPilot SITL (ArduCopter) in a screen/tmux session"
+	@echo "  mavproxy     - run MAVProxy GCS in a screen/tmux session"
+	@echo "  gz           - run Gazebo with ArduPilot SITL in
 	@echo "  ros2-build   - build ROS2 drone control package"
 	@echo "  ros2-launch  - launch ROS2 drone control system with MAVROS"
 	@echo "  test-flight  - run automated test flight (requires simulation + ROS2)"
@@ -20,11 +21,14 @@ install:
 build:
 	@bash scripts/bootstrap.sh --build-only
 
-iris-sim:
-	@bash scripts/run_iris_sim.sh
+sitl:
+	@scripts/sitl.sh
 
-iris-sim-bg:
-	@bash scripts/run_iris_sim.sh --background
+mavproxy:
+	@scripts/mavproxy.sh
+
+gz:
+	@scripts/gz.sh
 
 ros2-build:
 	@echo "Building ROS2 drone control package..."
@@ -44,8 +48,15 @@ test-flight:
 	@source /opt/ros/humble/setup.bash && source ./local_env.sh && source ros2_ws/install/setup.bash && \
 	ros2 run drone_control_pkg test_flight
 
+test-flight:
+	@echo "Running automated test flight..."
+	@echo "Make sure both simulation and ROS2 system are running!"
+	@source /opt/ros/humble/setup.bash && source ./local_env.sh && source ros2_ws/install/setup.bash && \
+	ros2 run drone_control_pkg test_flight
+
 stop:
 	@bash scripts/stop_all.sh
 
 clean:
-	rm -rf _deps/build-ardupilot _deps/ardupilot _deps/ardupilot_logs _deps/ardupilot_gazebo ros2_ws/build ros2_ws/install ros2_ws/log
+	rm -rf _deps/build-ardupilot _deps/ardupilot _deps/ardupilot_logs _deps/ardupilot_gazebo
+	

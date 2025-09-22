@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-# Try to clean up stray sim processes
-pkill -f sim_vehicle.py || true
-pkill -f ArduCopter.elf || true
-pkill -f gz || true
-echo "Requested termination of SITL and Gazebo if running."
+echo "[kill] Killing common sim processes …"
+pkill -f arducopter     2>/dev/null || true
+pkill -f mavproxy.py    2>/dev/null || true
+pkill -f "gz sim"       2>/dev/null || true
+echo "[kill] Done."

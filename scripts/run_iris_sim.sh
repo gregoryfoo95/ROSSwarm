@@ -1,67 +1,35 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-# Integrated ArduCopter SITL + Gazebo simulation launcher
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ARDU="$ROOT/_deps/ardupilot"
 WORLD="$ROOT/worlds/iris_runway.sdf"
+LOGDIR="$ROOT/_deps/ardupilot_logs"
 
 echo "[iris-sim] Starting integrated ArduCopter SITL + Gazebo simulation..."
-
-# Source the environment to ensure all paths are set
 source "$ROOT/local_env.sh"
 
-# Verify plugin paths
-if [ ! -d "$ROOT/_deps/ardupilot_gazebo/build" ]; then
-    echo "ERROR: ArduPilot Gazebo plugin not built. Run 'make install' first." >&2
-    exit 1
-fi
+[[ -d "$ROOT/_deps/ardupilot_gazebo/build" ]] || { echo "ERROR: build ardupilot_gazebo first"; exit 1; }
+[[ -f "$ARDU/build/sitl/bin/arducopter"     ]] || { echo "ERROR: build ArduCopter SITL first"; exit 1; }
+[[ -f "$WORLD"                              ]] || { echo "ERROR: world not found: $WORLD"; exit 1; }
+mkdir -p "$LOGDIR"
 
-# Check if ArduPilot is built
-if [ ! -f "$ARDU/build/sitl/bin/arducopter" ]; then
-    echo "ERROR: ArduCopter SITL not built. Run 'make build' first." >&2
-    exit 1
-fi
-
-# Check if world file exists
-if [ ! -f "$WORLD" ]; then
-    echo "ERROR: World file not found: $WORLD" >&2
-    exit 1
-fi
-
-# Function to cleanup background processes
-cleanup() {
-    echo "[iris-sim] Cleaning up..."
-    jobs -p | xargs -r kill
-    exit 0
-}
-trap cleanup SIGINT SIGTERM
-
-# Print environment info for debugging
-echo "[iris-sim] Gazebo version: $GZ_VERSION"
-echo "[iris-sim] Plugin path: $GZ_SIM_SYSTEM_PLUGIN_PATH"
-echo "[iris-sim] Resource path: $GZ_SIM_RESOURCE_PATH"
-
-# Start Gazebo with GUI in background
-echo "[iris-sim] Starting Gazebo with Iris world and GUI..."
-echo "[iris-sim] World file: $WORLD"
-echo "[iris-sim] Display: $DISPLAY"
-gz sim "$WORLD" --verbose --gui-config &
+gz sim "$WORLD" --verbose -r &
 GAZEBO_PID=$!
+for i in {1..40}; do gz topic -l 2>/dev/null | grep -q "/world/" && break; sleep 0.5; done
 
-# Wait for Gazebo to initialize and load the world
-echo "[iris-sim] Waiting for Gazebo to initialize..."
-sleep 10
-
-# Start ArduCopter SITL with custom home location
-echo "[iris-sim] Starting ArduCopter SITL..."
 cd "$ARDU"
+# **Disable MAVProxy** and make SITL send directly to QGC
 ./Tools/autotest/sim_vehicle.py \
   --vehicle ArduCopter \
   --frame gazebo-iris \
-  --out 127.0.0.1:14550 \
+  --no-mavproxy \
+  -A "--serial0=udpclient:127.0.0.1:14550" \
+  -L KSFO \
   -w \
-  -L 3DRBerkeley
+  >"$LOGDIR/sim_vehicle.log" 2>&1 &
+SITL_PID=$!
 
-# Wait for background processes
+echo "[iris-sim] SITL (no MAVProxy) PID: $SITL_PID  | Gazebo PID: $GAZEBO_PID"
+echo "[iris-sim] QGC will autoconnect on UDP 127.0.0.1:14550"
 wait

@@ -1,21 +1,20 @@
-#!/bin/bash
-# Local environment setup for ROSSwarm
+#!/usr/bin/env bash
+# Local environment setup for ROSSwarm (safe under set -u)
+# Gazebo version
+export GZ_VERSION=${GZ_VERSION:-garden}
 
-# ROS 2 Humble setup
-source /opt/ros/humble/setup.bash
+# ArduPilot Gazebo plugin + resources
+AP_GZ_BUILD="$HOME/dev/ROSSwarm/_deps/ardupilot_gazebo/build"
+AP_GZ_MODELS="$HOME/dev/ROSSwarm/_deps/ardupilot_gazebo/models"
+AP_GZ_WORLDS="$HOME/dev/ROSSwarm/_deps/ardupilot_gazebo/worlds"
 
-# Gazebo setup
-export GZ_VERSION=garden
+# Plugin search path
+export GZ_SIM_SYSTEM_PLUGIN_PATH="${AP_GZ_BUILD}:${GZ_SIM_SYSTEM_PLUGIN_PATH:-}"
 
-# ArduPilot Gazebo plugin paths
-export GZ_SIM_SYSTEM_PLUGIN_PATH="$HOME/dev/ROSSwarm/_deps/ardupilot_gazebo/build:$GZ_SIM_SYSTEM_PLUGIN_PATH"
-export GZ_SIM_RESOURCE_PATH="$HOME/dev/ROSSwarm/_deps/ardupilot_gazebo/models:$HOME/dev/ROSSwarm/_deps/ardupilot_gazebo/worlds:$GZ_SIM_RESOURCE_PATH"
+# Resource search paths (models + worlds). Mirror to legacy var for safety.
+export GZ_SIM_RESOURCE_PATH="${AP_GZ_MODELS}:${AP_GZ_WORLDS}:${GZ_SIM_RESOURCE_PATH:-}"
+export IGN_GAZEBO_RESOURCE_PATH="${GZ_SIM_RESOURCE_PATH}"
+export GZ_RESOURCE_PATH="${GZ_SIM_RESOURCE_PATH}"   # some tools look at this
 
-# Add local Python packages to path
-export PATH="$HOME/.local/bin:$PATH"
-
-# Convenience aliases
-alias gs='gz sim'
-alias srcros='source /opt/ros/humble/setup.bash'
-
-echo "ROSSwarm local environment loaded"
+# (Optional) classic variable for tools that still check it
+export GAZEBO_MODEL_PATH="${AP_GZ_MODELS}:${GAZEBO_MODEL_PATH:-}"

@@ -1,7 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: help install build sitl gazebo iris-sim stop clean
-
+.PHONY: help install build sitl mavproxy gz stop clean 
 help:
 	@echo "Targets:"
 	@echo "  install   - install local dependencies (ROS 2, Gazebo, ArduPilot)"
@@ -16,11 +15,18 @@ install:
 build:
 	@bash scripts/bootstrap.sh --build-only
 
-iris-sim:
-	@bash scripts/run_iris_sim.sh
+sitl:
+	@scripts/sitl.sh
+
+mavproxy:
+	@scripts/mavproxy.sh
+
+gz:
+	@scripts/gz.sh
 
 stop:
 	@bash scripts/stop_all.sh
 
 clean:
 	rm -rf _deps/build-ardupilot _deps/ardupilot _deps/ardupilot_logs _deps/ardupilot_gazebo
+	
